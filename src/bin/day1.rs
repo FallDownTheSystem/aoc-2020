@@ -1,6 +1,6 @@
+use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
-use std::collections::HashSet;
 
 // Part 1
 fn find_sum_of_two(sum: i32, integers: &[i32]) -> Option<(i32, i32)> {
@@ -29,7 +29,7 @@ fn find_sum_of_three(sum: i32, integers: &[i32]) -> Option<(i32, i32, i32)> {
 		for &j in &integers[1..] {
 			let x = sum - i - j;
 			if set.contains(&x) {
-				return Some((i, j, x))
+				return Some((i, j, x));
 			}
 			set.insert(j);
 		}
@@ -46,8 +46,14 @@ fn test2() {
 
 fn main() {
 	let mut buffer = String::new();
-	io::stdin().read_to_string(&mut buffer).expect("Failed to read stdin");
-	let integers = buffer.lines().map(|f| f.trim().parse().expect("Failed to parse integer")).collect::<Vec<_>>();
+	io::stdin()
+		.read_to_string(&mut buffer)
+		.expect("Failed to read stdin");
+	let integers = buffer
+		.lines()
+		.map(|f| f.trim().parse().expect("Failed to parse integer"))
+		.collect::<Vec<_>>();
+
 	// Part 1
 	let res = find_sum_of_two(2020, &integers);
 	if let Some(res) = res {
