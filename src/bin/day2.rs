@@ -1,34 +1,32 @@
 use std::io;
 use std::io::prelude::*;
+use std::str::FromStr;
 
 #[derive(Debug)]
 struct Policy {
 	low: u8,
 	high: u8,
 	character: char,
-	password: String, // Is having an owned String here a goood idea?
+	password: String,
 }
 
 impl Policy {
 	fn valid(&self) -> bool {
-		let length = self
-			.password
-			.chars()
-			.filter(|c| c == &self.character)
-			.collect::<Vec<_>>()
-			.len() as u8;
+		let length = self.password.chars().filter(|c| c == &self.character).count() as u8;
 		length >= self.low && length <= self.high
 	}
 
 	fn valid_new(&self) -> bool {
 		let chars = self.password.chars().collect::<Vec<_>>();
 		// I don't like having to map these as usize
+		// It's because part 1 they weren't indices, but part 2 they are
 		let first = chars[(self.low - 1) as usize] == self.character;
 		let second = chars[(self.high - 1) as usize] == self.character;
 		(first || second) && first != second
 	}
 }
 
+// FIX ME! Use FromStr instead
 impl From<&str> for Policy {
 	fn from(line: &str) -> Self {
 		let parts = line.split(' ').collect::<Vec<_>>();
@@ -54,13 +52,9 @@ fn test1() {
 		1-3 b: cdefg
 		2-9 c: ccccccccc";
 	let lines = lines.lines().map(|f| f.trim()).collect::<Vec<_>>();
-	let policies = lines
-		.iter()
-		.map(|&x| Policy::from(x))
-		.filter(|x| x.valid())
-		.collect::<Vec<_>>();
+	let policies = lines.iter().map(|&x| Policy::from(x)).filter(|x| x.valid()).count();
 
-	assert_eq!(2, policies.len())
+	assert_eq!(2, policies)
 }
 
 #[test]
@@ -70,13 +64,9 @@ fn test2() {
 		1-3 b: cdefg
 		2-9 c: ccccccccc";
 	let lines = lines.lines().map(|f| f.trim()).collect::<Vec<_>>();
-	let policies = lines
-		.iter()
-		.map(|&x| Policy::from(x))
-		.filter(|x| x.valid_new())
-		.collect::<Vec<_>>();
+	let policies = lines.iter().map(|&x| Policy::from(x)).filter(|x| x.valid_new()).count();
 
-	assert_eq!(1, policies.len())
+	assert_eq!(1, policies)
 }
 
 fn main() {
@@ -86,10 +76,9 @@ fn main() {
 	let lines = buffer.lines().map(|f| f.trim()).collect::<Vec<_>>();
 	let policies = lines.iter().map(|&x| Policy::from(x)).collect::<Vec<_>>();
 
-	// Reference to a reference of a policy in filter, automatic deref magic?
-	let part1_policies = policies.iter().filter(|x| x.valid()).collect::<Vec<_>>();
-	println!("{}", part1_policies.len());
+	let part1_policies = policies.iter().filter(|&x| x.valid()).count();
+	println!("{}", part1_policies);
 
-	let part2_policies = policies.iter().filter(|x| x.valid_new()).collect::<Vec<_>>();
-	println!("{}", part2_policies.len());
+	let part2_policies = policies.iter().filter(|&x| x.valid_new()).count();
+	println!("{}", part2_policies);
 }
